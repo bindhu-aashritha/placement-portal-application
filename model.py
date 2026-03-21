@@ -8,11 +8,11 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    role = db.Column(db.String(20), nullable=False)  # admin / student / company
+    role = db.Column(db.String(20), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
     
-    student_profile = db.relationship('StudentProfile', backref='user', uselist=False)
-    company_profile = db.relationship('CompanyProfile', backref='user', uselist=False)
+    student_profile = db.relationship('StudentProfile', backref='user', uselist=False, cascade="all, delete-orphan")
+    company_profile = db.relationship('CompanyProfile', backref='user', uselist=False, cascade="all, delete-orphan")
 
 class StudentProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -20,7 +20,7 @@ class StudentProfile(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     resume = db.Column(db.String(200))
     
-    applications = db.relationship('Application', backref='student', lazy=True)
+    applications = db.relationship('Application', backref='student_profile', lazy=True)
 
 class CompanyProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -30,7 +30,7 @@ class CompanyProfile(db.Model):
     website = db.Column(db.String(100))
     is_approved = db.Column(db.Boolean, default=False)
     
-    drives = db.relationship('PlacementDrive', backref='company', lazy=True)
+    drives = db.relationship('PlacementDrive', backref='company_profile', lazy=True)
 
 class PlacementDrive(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -47,15 +47,15 @@ class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('student_profile.id'), nullable=False)
     drive_id = db.Column(db.Integer, db.ForeignKey('placement_drive.id'), nullable=False)
-    application_date = db.Column(db.String(50), default=lambda: str(datetime.utcnow()))
+    application_date = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(50), default="applied")
+
+    __table_args__ = (
+        db.UniqueConstraint('student_id', 'drive_id', name='unique_application_per_drive'),
+    )
 
 class Placement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    application_id = db.Column(db.Integer, db.ForeignKey('application.id'))
-    placement_date = db.Column(db.String(50))
+    application_id = db.Column(db.Integer, db.ForeignKey('application.id'), unique=True)
+    placement_date = db.Column(db.DateTime, default=datetime.utcnow)
     package = db.Column(db.String(50))
-
-    __table_args__ = (
-        db.UniqueConstraint('student_id', 'drive_id', name='unique_application'),
-    )
