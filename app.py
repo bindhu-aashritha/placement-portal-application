@@ -208,7 +208,11 @@ def search_students():
     return render_template('admin_dashboard.html', students=students, 
         companies=CompanyProfile.query.all(),
         drives=PlacementDrive.query.all(),
-        applications=Application.query.all())
+        applications=Application.query.all(), 
+        total_students=StudentProfile.query.count(),
+        total_companies=CompanyProfile.query.count(),
+        total_drives=PlacementDrive.query.count(),
+        total_applications=Application.query.count())
 
 #search company
 @app.route('/search_companies')
@@ -222,10 +226,15 @@ def search_companies():
         CompanyProfile.company_name.contains(query)
     ).all()
 
-    return render_template('admin_dashboard.html',students=StudentProfile.query.all(),
+    return render_template('admin_dashboard.html',
+        students=StudentProfile.query.all(),
         companies=companies,
         drives=PlacementDrive.query.all(),
-        applications=Application.query.all())
+        applications=Application.query.all(),
+        total_students=StudentProfile.query.count(),
+        total_companies=CompanyProfile.query.count(),
+        total_drives=PlacementDrive.query.count(),
+        total_applications=Application.query.count())
 
 #deactivate user-------
 @app.route('/deactivate_user/<int:id>')
@@ -249,6 +258,50 @@ def activate_user(id):
     user.is_active = True
     db.session.commit()
 
+    return redirect(url_for('admin_dashboard'))
+
+#delete
+@app.route('/delete_student/<int:id>')
+def delete_student(id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('login'))
+
+    student = StudentProfile.query.get_or_404(id)
+    db.session.delete(student)
+    db.session.commit()
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/delete_company/<int:id>')
+def delete_company(id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('login'))
+
+    company = CompanyProfile.query.get_or_404(id)
+    db.session.delete(company)
+    db.session.commit()
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/delete_drive/<int:id>')
+def delete_drive(id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('login'))
+
+    drive = PlacementDrive.query.get_or_404(id)
+    db.session.delete(drive)
+    db.session.commit()
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/delete_application/<int:id>')
+def delete_application(id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('login'))
+
+    app_obj = Application.query.get_or_404(id)
+    db.session.delete(app_obj)
+    db.session.commit()
     return redirect(url_for('admin_dashboard'))
 
 #to run

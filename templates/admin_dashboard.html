@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+
+<h1>Admin Dashboard</h1>
+
+<!--statistics-->
+<h3>Statistics</h3>
+<ul>
+    <li>Total Students: {{ total_students }}</li>
+    <li>Total Companies: {{ total_companies }}</li>
+    <li>Total Drives: {{ total_drives }}</li>
+    <li>Total Applications: {{ total_applications }}</li>
+</ul>
+
+<hr>
+<!--search-->
+<h3>Search</h3>
+
+<form action="/search_students">
+    <input type="text" name="q" placeholder="Search students">
+    <button type="submit">Search</button>
+</form>
+
+<form action="/search_companies">
+    <input type="text" name="q" placeholder="Search companies">
+    <button type="submit">Search</button>
+</form>
+
+<hr>
+
+<!--students-->
+<h2>Students</h2>
+<table border="1">
+<tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Phone</th>
+    <th>Action</th>
+</tr>
+
+{% for s in students %}
+<tr>
+    <td>{{ s.id }}</td>
+    <td>{{ s.user.name }}</td>
+    <td>{{ s.phone }}</td>
+    <td>
+        <a href="/deactivate_user/{{ s.user.id }}">Deactivate</a> |
+        <a href="/delete_student/{{ s.id }}">Delete</a>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+<hr>
+<!--companies-->
+<h2>Companies</h2>
+<table border="1">
+<tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Approved</th>
+    <th>Action</th>
+</tr>
+
+{% for c in companies %}
+<tr>
+    <td>{{ c.id }}</td>
+    <td>{{ c.company_name }}</td>
+    <td>{{ c.is_approved }}</td>
+    <td>
+        <a href="/approve_company/{{ c.id }}">Approve</a> |
+        <a href="/reject_company/{{ c.id }}">Reject</a> |
+        <a href="/deactivate_user/{{ c.user.id }}">Deactivate</a> |
+        <a href="/delete_company/{{ c.id }}">Delete</a>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+<hr>
+<!--drives-->
+<h2>Placement Drives</h2>
+<table border="1">
+<tr>
+    <th>ID</th>
+    <th>Company</th>
+    <th>Job Title</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
+
+{% for d in drives %}
+<tr>
+    <td>{{ d.id }}</td>
+    <td>{{ d.company_profile.company_name }}</td>
+    <td>{{ d.job_title }}</td>
+    <td>{{ d.status }}</td>
+    <td>
+        <a href="/approve_drive/{{ d.id }}">Approve</a> |
+        <a href="/reject_drive/{{ d.id }}">Reject</a> |
+        <a href="/delete_drive/{{ d.id }}">Delete</a>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+<hr>
+<!--applications-->
+<h2>Applications</h2>
+<table border="1">
+<tr>
+    <th>ID</th>
+    <th>Student</th>
+    <th>Drive</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
+
+{% for a in applications %}
+<tr>
+    <td>{{ a.id }}</td>
+    <td>{{ a.student_profile.user.name }}</td>
+    <td>{{ a.drive.job_title }}</td>
+    <td>{{ a.status }}</td>
+    <td>
+        <a href="/delete_application/{{ a.id }}">Delete</a>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+<br><br>
+<a href="/logout">Logout</a>
+
+</body>
+</html>
