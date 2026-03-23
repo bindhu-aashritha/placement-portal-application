@@ -110,11 +110,11 @@ def dashboard():
     if session['role'] == 'admin':
         return redirect(url_for('admin_dashboard'))
     elif session['role'] == 'company':
-        return "Company Dashboard"
+        return redirect(url_for('company_dashboard'))
     else:
         return "Student Dashboard"
 
-#admin dashboard
+#admin dashboard routes
 @app.route('/admin')
 def admin_dashboard():
 
@@ -303,6 +303,108 @@ def delete_application(id):
     db.session.delete(app_obj)
     db.session.commit()
     return redirect(url_for('admin_dashboard'))
+
+#company dashboard routes
+@app.route('/company/dashboard')
+def company_dashboard():
+    if session.get('role') != 'company':
+        return redirect(url_for('login'))
+
+    user_id = session.get('user_id')
+    company = CompanyProfile.query.filter_by(user_id=user_id).first()
+
+    drives = PlacementDrive.query.filter_by(company_id=company.id).all()
+
+    applications = Application.query.join(PlacementDrive).filter(
+        PlacementDrive.company_id == company.id
+    ).all()
+
+    return render_template('company_dashboard.html',
+                           company=company,
+                           drives=drives,
+                           applications=applications)
+
+@app.route('/company/post_job', methods=['GET', 'POST'])
+def post_job():
+    if session.get('role') != 'company':
+        return redirect(url_for('login'))
+
+    user_id = session.get('user_id')
+    company = CompanyProfile.query.filter_by(user_id=user_id).first()
+
+    if request.method == 'POST':
+        drive = PlacementDrive(
+            company_id=company.id,
+            job_title=request.form['job_title'],
+            job_description=request.form['job_description'],
+            eligibility=request.form['eligibility'],
+            deadline=request.form['deadline'],
+            status="pending"  
+        )
+
+        db.session.add(drive)
+        db.session.commit()
+
+        flash("Job posted successfully!")
+        return redirect(url_for('company_dashboard'))
+
+    return render_template('post_job.html')
+
+@app.route('/company/update_job_status/<int:id>')
+def update_job_status(id):
+    if session.get('role') != 'company':
+        return redirect(url_for('login'))
+
+    drive = PlacementDrive.query.get_or_404(id)
+
+    if drive.status == "Active":
+        drive.status = "Closed"
+    else:
+        drive.status = "Active"
+
+    db.session.commit()
+    return redirect(url_for('company_dashboard'))
+
+@app.route('/company/applications/<int:drive_id>')
+def view_applications(drive_id):
+    if session.get('role') != 'company':
+        return redirect(url_for('login'))
+
+    drive = PlacementDrive.query.get_or_404(drive_id)
+    applications = Application.query.filter_by(drive_id=drive.id).all()
+
+    return render_template('view_applications.html',
+                           drive=drive,
+                           applications=applications)
+
+@app.route('/company/update_application/<int:id>/<status>')
+def update_application(id, status):
+    if session.get('role') != 'company':
+        return redirect(url_for('login'))
+
+    application = Application.query.get_or_404(id)
+
+    if status in ["Shortlisted", "Selected", "Rejected"]:
+        application.status = status
+        db.session.commit()
+
+    return redirect(url_for('company_dashboard'))
+
+@app.route('/company/shortlisted')
+def shortlisted_students():
+    if session.get('role') != 'company':
+        return redirect(url_for('login'))
+
+    user_id = session.get('user_id')
+    company = CompanyProfile.query.filter_by(user_id=user_id).first()
+
+    applications = Application.query.join(PlacementDrive).filter(
+        PlacementDrive.company_id == company.id,
+        Application.status == "Shortlisted"
+    ).all()
+
+    return render_template('shortlisted_students.html',
+                           applications=applications)
 
 #to run
 if __name__ == '__main__':
