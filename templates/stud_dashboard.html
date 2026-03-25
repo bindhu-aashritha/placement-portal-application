@@ -1,11 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Student Dashboard</title>
-</head>
-<body class="bg-light">
-
 {% extends "base.html" %}
 
 {% block title %}Student Dashboard {% endblock %}
@@ -86,7 +78,7 @@
                                 <span class="badge bg-secondary">Applied</span>
                             {% elif app.status == 'Shortlisted' %}
                                 <span class="badge bg-success">Shortlisted</span>
-                                <div class="small text-success mt-1">You are shortlisted, check email!</div>
+                                <div class="small text-success mt-1">You are shortlisted. Check email!</div>
                             {% elif app.status == 'Rejected' %}
                                 <span class="badge bg-danger">Rejected</span>
                             {% else %}
@@ -103,5 +95,3 @@
     </div>
 </div>
 {% endblock %}
-</body>
-</html>

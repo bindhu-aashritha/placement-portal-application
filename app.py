@@ -182,7 +182,7 @@ def approve_drive(id):
         return redirect(url_for('login'))
 
     drive = PlacementDrive.query.get_or_404(id)
-    drive.status = "approved"
+    drive.status = "active"
     db.session.commit()
 
     return redirect(url_for('admin_dashboard'))
@@ -429,13 +429,13 @@ def student_dashboard():
     if query:
         # Search by job title, company, or skills
         drives = PlacementDrive.query.join(CompanyProfile).filter(
-            PlacementDrive.status == 'approved',
+            PlacementDrive.status == 'active',
             (PlacementDrive.job_title.contains(query)) |
             (CompanyProfile.company_name.contains(query)) |
             (PlacementDrive.job_description.contains(query))
         ).all()
     else:
-        drives = PlacementDrive.query.filter_by(status='approved').all()
+        drives = PlacementDrive.query.filter_by(status='active').all()
 
     #application history for this student
     history = Application.query.filter_by(student_id=student.id).all()
@@ -480,14 +480,14 @@ def apply_job(drive_id):
     # Check if already applied
     existing = Application.query.filter_by(student_id=student.id, drive_id=drive_id).first()
     if existing:
-        flash("You have already applied for this job.")
+        flash("You have already applied to this job.")
         return redirect(url_for('student_dashboard'))
 
     new_app = Application(student_id=student.id, drive_id=drive_id, status="Applied")
     db.session.add(new_app)
     db.session.commit()
     
-    flash("Successfully applied!")
+    flash("Applied successfully")
     return redirect(url_for('student_dashboard'))
 
 
