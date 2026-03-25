@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IIT Placement Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body class="bg-light">
+
+<header class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-3 fw-bold">Placement Portal</h1>
+        <p class="lead mb-4">Connecting students to opportunities.</p>
+        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+            <a href="{{ url_for('login') }}" class="btn btn-light btn-lg px-4 gap-3">Login to Account</a>
+            <a href="{{ url_for('register_student') }}" class="btn btn-outline-light btn-lg px-4">Student Register</a>
+        </div>
+    </div>
+</header>
+
+<div class="container py-5">
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+        <div class="feature col text-center">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-primary fs-2 mb-3">
+                <i class="bi bi-person-badge"></i>
+            </div>
+            <h3 class="fs-4">For Students</h3>
+            <p>Build your profile and apply to placement drives.</p>
+            <a href="{{ url_for('register_student') }}" class="btn btn-primary btn-sm">Join as Student</a>
+        </div>
+        <div class="feature col text-center">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-primary fs-2 mb-3">
+                <i class="bi bi-building"></i>
+            </div>
+            <h3 class="fs-4">For Companies</h3>
+            <p>Post job descriptions, eligibility criteria, and manage student applications.</p>
+            <a href="{{ url_for('register_company') }}" class="btn btn-outline-primary btn-sm">Partner With Us</a>
+        </div>
+        <div class="feature col text-center">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-primary fs-2 mb-3">
+                <i class="bi bi-shield-lock"></i>
+            </div>
+            <h3 class="fs-4">For Admin:</h3>
+            <p>Perform student management, drive approvals and view placement analytics for the institution.</p>
+        </div>
+    </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

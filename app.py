@@ -7,6 +7,14 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ppa.db'
 app.config['SECRET_KEY'] = 'secret_1'
 
+#handling student resumes uploads
+import os
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = 'static/resumes'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# Creating directory if not there
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 db.init_app(app)
 
 #init
@@ -92,7 +100,8 @@ def register_company():
 
         company_profile = CompanyProfile(
             user_id=user.id,
-            company_name=request.form['company_name']
+            company_name=request.form['company_name'],
+            is_approved=False
         )
         db.session.add(company_profile)
         db.session.commit()
@@ -111,8 +120,8 @@ def dashboard():
         return redirect(url_for('admin_dashboard'))
     elif session['role'] == 'company':
         return redirect(url_for('company_dashboard'))
-    else:
-        return "Student Dashboard"
+    elif session['role'] == 'student':
+        return redirect(url_for('student_dashboard'))
 
 #admin dashboard routes
 @app.route('/admin')
@@ -357,10 +366,10 @@ def update_job_status(id):
 
     drive = PlacementDrive.query.get_or_404(id)
 
-    if drive.status == "Active":
-        drive.status = "Closed"
+    if drive.status == "active":
+        drive.status = "closed"
     else:
-        drive.status = "Active"
+        drive.status = "active"
 
     db.session.commit()
     return redirect(url_for('company_dashboard'))
@@ -405,6 +414,82 @@ def shortlisted_students():
 
     return render_template('shortlisted_students.html',
                            applications=applications)
+
+#STUDENT
+#student dashboard
+@app.route('/student/dashboard')
+def student_dashboard():
+    if session.get('role') != 'student':
+        return redirect(url_for('login'))
+
+    user_id = session.get('user_id')
+    student = StudentProfile.query.filter_by(user_id=user_id).first()
+    
+    query = request.args.get('q', '')
+    if query:
+        # Search by job title, company, or skills
+        drives = PlacementDrive.query.join(CompanyProfile).filter(
+            PlacementDrive.status == 'approved',
+            (PlacementDrive.job_title.contains(query)) |
+            (CompanyProfile.company_name.contains(query)) |
+            (PlacementDrive.job_description.contains(query))
+        ).all()
+    else:
+        drives = PlacementDrive.query.filter_by(status='approved').all()
+
+    #application history for this student
+    history = Application.query.filter_by(student_id=student.id).all()
+
+    return render_template('stud_dashboard.html', student=student, drives=drives, history=history)
+
+#update student profile
+@app.route('/student/update_profile', methods=['GET', 'POST'])
+def update_profile():
+    if session.get('role') != 'student':
+        return redirect(url_for('login'))
+        
+    student = StudentProfile.query.filter_by(user_id=session['user_id']).first()
+
+    if request.method == 'POST':
+        student.phone = request.form.get('phone')
+        student.education = request.form.get('education')
+        student.skills = request.form.get('skills')
+        
+        # Resume Upload
+        file = request.files.get('resume')
+        if file and file.filename != '':
+            # Create a unique filename using student ID
+            filename = secure_filename(f"res_{student.id}_{file.filename}")
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            student.resume = filename
+            
+        db.session.commit()
+        flash("Profile updated successfully")
+        return redirect(url_for('student_dashboard'))
+
+    return render_template('stud_profile.html', student=student)
+
+#apply to job
+@app.route('/apply/<int:drive_id>')
+def apply_job(drive_id):
+    if session.get('role') != 'student':
+        return redirect(url_for('login'))
+    
+    student = StudentProfile.query.filter_by(user_id=session['user_id']).first()
+    
+    # Check if already applied
+    existing = Application.query.filter_by(student_id=student.id, drive_id=drive_id).first()
+    if existing:
+        flash("You have already applied for this job.")
+        return redirect(url_for('student_dashboard'))
+
+    new_app = Application(student_id=student.id, drive_id=drive_id, status="Applied")
+    db.session.add(new_app)
+    db.session.commit()
+    
+    flash("Successfully applied!")
+    return redirect(url_for('student_dashboard'))
+
 
 #to run
 if __name__ == '__main__':

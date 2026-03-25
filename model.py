@@ -19,6 +19,8 @@ class StudentProfile(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
     resume = db.Column(db.String(200))
+    education = db.Column(db.String(200)) #added during student dashboard milestone
+    skills = db.Column(db.Text)
     
     applications = db.relationship('Application', backref='student_profile', lazy=True)
 

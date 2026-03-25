@@ -1,23 +1,26 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title> Login Page</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-    <h1>Login</h1>
-    <label for="your_name">Name:</label>
-    <input type="text" name="your_name" id="your_name" value="" placeholder="Enter your name" /><br><br>
-    <label for="role">Select your role:</label>
-    <select name="role" id="role">
-        <option value="student">Student</option>
-        <option value="admin">Admin</option>
-        <option value="company">Company</option>
-    </select> <br><br>
-    <label for="username">Username:</label>
-    <input type="text" name="username" id="username" value="" placeholder="Enter username" /><br><br>
-    <label for="pwd">Password:</label>
-    <input type="password" name="pwd" id="pwd" value="" placeholder="Enter password" /><br><br>
-    </body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Login Page {% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow p-4 mx-auto" style="max-width: 400px;">
+        <h1 class="h3 text-center mb-4">Login</h1>
+        <form action="/login" method="POST">
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+        <div class="text-center mt-3 small">
+            Student register <a href="/student/register">Register</a><br>
+            Company register <a href="/company/register">Register</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
