@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Company Registration{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg p-4 mx-auto" style="max-width: 500px; border-top: 5px solid #198754;">
+    <h3 class="text-center mb-4">Company Registration</h3>
+    <form action="{{ url_for('company_register') }}" method="POST">
+        <div class="mb-3">
+            <label class="form-label">Company Name</label>
+            <input type="text" name="company_name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email Address</label>
+            <input type="email" name="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Website URL</label>
+            <input type="url" name="website" class="form-control" placeholder="https://example.com">
+        </div>
+        <button type="submit" class="btn btn-success w-100">Create Company Account</button>
+    </form>
+    <div class="text-center mt-3">
+    <small>Already registered? <a href="{{ url_for('login') }}">Login here</a></small>
+    </div>
+    </div>
+</div>
+{% endblock %}

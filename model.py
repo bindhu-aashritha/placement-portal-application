@@ -17,7 +17,7 @@ class User(db.Model):
 class StudentProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    phone = db.Column(db.String(20), nullable=False)
+    phone = db.Column(db.String(20), nullable=True)
     resume = db.Column(db.String(200))
     education = db.Column(db.String(200)) #added during student dashboard milestone
     skills = db.Column(db.Text)

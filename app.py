@@ -66,7 +66,7 @@ def logout():
 
 #register- student registration
 @app.route('/student/register', methods=['GET', 'POST'])
-def register_student():
+def student_register():
     if request.method == 'POST':
         user = User(
             name=request.form['name'],
@@ -75,8 +75,7 @@ def register_student():
             role='student'
         )
         db.session.add(user)
-        db.session.commit()
-
+       
         student_profile = StudentProfile(user_id=user.id, phone=request.form['phone'])
         db.session.add(student_profile)
         db.session.commit()
@@ -87,7 +86,7 @@ def register_student():
 
 #register- company registration
 @app.route('/company/register', methods=['GET', 'POST'])
-def register_company():
+def company_register():
     if request.method == 'POST':
         user = User(
             name=request.form['name'],
@@ -96,8 +95,7 @@ def register_company():
             role='company'
         )
         db.session.add(user)
-        db.session.commit()
-
+       
         company_profile = CompanyProfile(
             user_id=user.id,
             company_name=request.form['company_name'],
@@ -490,6 +488,34 @@ def apply_job(drive_id):
     flash("Applied successfully")
     return redirect(url_for('student_dashboard'))
 
+#to delete resume
+@app.route('/student/delete_resume')
+def delete_resume():
+    if session.get('role') != 'student':
+        return redirect(url_for('login'))
+
+    student = StudentProfile.query.filter_by(user_id=session['user_id']).first()
+
+    if student and student.resume:
+        # 1. Construct the full path to the file
+        file_path = os.path.join(app.root_path, 'static/resumes', student.resume)
+
+        # 2. Delete the physical file from the folder
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            
+            # 3. Clear the filename from the database
+            student.resume = None
+            db.session.commit()
+            flash("Resume deleted successfully.")
+        except Exception as e:
+            db.session.rollback()
+            flash("Error deleting file from storage.")
+    else:
+        flash("No resume found to delete.")
+
+    return redirect(url_for('update_profile'))
 
 #to run
 if __name__ == '__main__':
