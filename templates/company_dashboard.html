@@ -48,17 +48,18 @@
             <td>{{ d.deadline }}</td>
 
             <td>
-                {% if d.status == "Active" %}
-                    <span class="text-success">Active</span>
+                {% if d.status == "active" %}
+                   <span class="badge bg-success">Active</span>
+                {% elif d.status == "closed" %}
+                   <span class="badge bg-danger">Closed</span>
+                {% elif d.status == "pending" %}
+                   <span class="badge bg-warning text-dark">Pending Approval</span>
                 {% else %}
-                    <span class="text-danger">{{ d.status }}</span>
+                   <span class="badge bg-secondary">{{ d.status }}</span>
                 {% endif %}
             </td>
-
             <td>
-                <a href="{{ url_for('update_job_status', id=d.id) }}" class="btn btn-warning btn-sm">
-                    Change
-                </a>
+                <a href="{{ url_for('update_job_status', id=d.id) }}" class="btn btn-warning btn-sm">Change</a>
             </td>
         </tr>
         {% endfor %}
@@ -89,12 +90,16 @@
             <td>{{ a.status }}</td>
 
             <td>
-                <a href="{{ url_for('update_application', id=a.id, status='Shortlisted') }}" class="btn btn-primary btn-sm">Shortlist</a>
+               <a href="{{ url_for('update_application', id=a.id, status='Shortlisted') }}" class="btn btn-primary btn-sm">Shortlist</a>
 
-                <a href="{{ url_for('update_application', id=a.id, status='Selected') }}" class="btn btn-success btn-sm">Select</a>
+               <a href="{{ url_for('update_application', id=a.id, status='Interview') }}" class="btn btn-warning btn-sm">Interview</a>
 
-                <a href="{{ url_for('update_application', id=a.id, status='Rejected') }}" class="btn btn-danger btn-sm">Reject</a>
-            </td>
+               <a href="{{ url_for('update_application', id=a.id, status='Selected') }}" class="btn btn-success btn-sm">Select</a>
+
+               <a href="{{ url_for('update_application', id=a.id, status='Rejected') }}" class="btn btn-danger btn-sm">Reject</a>
+
+               <a href="{{ url_for('update_application', id=a.id, status='Placed') }}" class="btn btn-dark btn-sm">Placed</a>
+        </td>
         </tr>
         {% endfor %}
     </table>

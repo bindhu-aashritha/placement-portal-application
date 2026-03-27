@@ -89,7 +89,7 @@ def student_register():
 def company_register():
     if request.method == 'POST':
         user = User(
-            name=request.form['name'],
+            name=request.form['company_name'],
             email=request.form['email'],
             password=request.form['password'],
             role='company'
@@ -339,6 +339,10 @@ def post_job():
     user_id = session.get('user_id')
     company = CompanyProfile.query.filter_by(user_id=user_id).first()
 
+    if not company.is_approved:
+        flash("Company not approved by admin.")
+        return redirect(url_for('company_dashboard'))
+
     if request.method == 'POST':
         drive = PlacementDrive(
             company_id=company.id,
@@ -355,7 +359,7 @@ def post_job():
         flash("Job posted successfully!")
         return redirect(url_for('company_dashboard'))
 
-    return render_template('post_job.html')
+    return redirect(url_for('company_dashboard'))
 
 @app.route('/company/update_job_status/<int:id>')
 def update_job_status(id):
@@ -372,46 +376,19 @@ def update_job_status(id):
     db.session.commit()
     return redirect(url_for('company_dashboard'))
 
-@app.route('/company/applications/<int:drive_id>')
-def view_applications(drive_id):
-    if session.get('role') != 'company':
-        return redirect(url_for('login'))
-
-    drive = PlacementDrive.query.get_or_404(drive_id)
-    applications = Application.query.filter_by(drive_id=drive.id).all()
-
-    return render_template('view_applications.html',
-                           drive=drive,
-                           applications=applications)
-
 @app.route('/company/update_application/<int:id>/<status>')
 def update_application(id, status):
     if session.get('role') != 'company':
         return redirect(url_for('login'))
 
     application = Application.query.get_or_404(id)
+    valid_status = ["Applied", "Shortlisted", "Interview", "Selected", "Rejected", "Placed"]
 
-    if status in ["Shortlisted", "Selected", "Rejected"]:
+    if status in valid_status:
         application.status = status
         db.session.commit()
 
     return redirect(url_for('company_dashboard'))
-
-@app.route('/company/shortlisted')
-def shortlisted_students():
-    if session.get('role') != 'company':
-        return redirect(url_for('login'))
-
-    user_id = session.get('user_id')
-    company = CompanyProfile.query.filter_by(user_id=user_id).first()
-
-    applications = Application.query.join(PlacementDrive).filter(
-        PlacementDrive.company_id == company.id,
-        Application.status == "Shortlisted"
-    ).all()
-
-    return render_template('shortlisted_students.html',
-                           applications=applications)
 
 #STUDENT
 #student dashboard

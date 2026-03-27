@@ -19,7 +19,7 @@
             <h5 class="mb-0">Job postings available</h5>
         </div>
         <div class="card-body">
-            <form action="/dashboard" method="GET" class="row g-2 mb-4">
+            <form action="{{ url_for('student_dashboard') }}" method="GET" class="row g-2 mb-4">
                 <div class="col-md-10">
                     <input type="text" name="q" class="form-control" placeholder="Search by Company, Position, or Skills..">
                 </div>
@@ -66,6 +66,7 @@
                         <th>Company</th>
                         <th>Job Title</th>
                         <th>Status</th>
+                        <th>Date</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -74,20 +75,22 @@
                         <td>{{ app.drive.company_profile.company_name }}</td>
                         <td>{{ app.drive.job_title }}</td>
                         <td>
-                            {% if app.status == 'Applied' %}
-                                <span class="badge bg-secondary">Applied</span>
-                            {% elif app.status == 'Shortlisted' %}
-                                <span class="badge bg-success">Shortlisted</span>
-                                <div class="small text-success mt-1">You are shortlisted. Check email!</div>
-                            {% elif app.status == 'Rejected' %}
-                                <span class="badge bg-danger">Rejected</span>
-                            {% else %}
-                                <span class="badge bg-info">{{ app.status }}</span>
-                            {% endif %}
+                        {% if app.status == 'Applied' %}
+                            <span class="badge bg-secondary">Applied</span>
+                        {% elif app.status == 'Shortlisted' %}
+                            <span class="badge bg-success">Shortlisted</span>
+                            <div class="small text-success mt-1">You are shortlisted. Check email!</div>
+                        {% elif app.status == 'Rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                        {% else %}
+                            <span class="badge bg-info">{{ app.status }}</span>
+                        {% endif %}
                         </td>
+
+                        <td>{{ app.application_date.strftime('%Y-%m-%d') }}</td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="3" class="text-center py-3">You have not yet applied for any job.</td></tr>
+                    <tr><td colspan="4" class="text-center py-3">You have not yet applied for any job.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
