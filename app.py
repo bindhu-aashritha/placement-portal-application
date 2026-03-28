@@ -2,6 +2,7 @@ from flask import Flask
 from model import db
 from flask import render_template, redirect, url_for, session, request, flash
 from model import User, CompanyProfile, StudentProfile, PlacementDrive, Application
+from flask import jsonify
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ppa.db'
@@ -75,6 +76,7 @@ def student_register():
             role='student'
         )
         db.session.add(user)
+        db.session.flush()
        
         student_profile = StudentProfile(user_id=user.id, phone=request.form['phone'])
         db.session.add(student_profile)
@@ -95,11 +97,12 @@ def company_register():
             role='company'
         )
         db.session.add(user)
+        db.session.flush()
        
         company_profile = CompanyProfile(
             user_id=user.id,
             company_name=request.form['company_name'],
-            is_approved=False
+            is_approved=True
         )
         db.session.add(company_profile)
         db.session.commit()
@@ -430,10 +433,10 @@ def update_profile():
         student.education = request.form.get('education')
         student.skills = request.form.get('skills')
         
-        # Resume Upload
+        #to upload resume
         file = request.files.get('resume')
         if file and file.filename != '':
-            # Create a unique filename using student ID
+            #create a unique filename using student id
             filename = secure_filename(f"res_{student.id}_{file.filename}")
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             student.resume = filename
@@ -452,7 +455,7 @@ def apply_job(drive_id):
     
     student = StudentProfile.query.filter_by(user_id=session['user_id']).first()
     
-    # Check if already applied
+    #check if applied already
     existing = Application.query.filter_by(student_id=student.id, drive_id=drive_id).first()
     if existing:
         flash("You have already applied to this job.")
@@ -474,10 +477,10 @@ def delete_resume():
     student = StudentProfile.query.filter_by(user_id=session['user_id']).first()
 
     if student and student.resume:
-        # 1. Construct the full path to the file
+        #constructing full path to file
         file_path = os.path.join(app.root_path, 'static/resumes', student.resume)
 
-        # 2. Delete the physical file from the folder
+        #deleting physical file from the folder
         try:
             if os.path.exists(file_path):
                 os.remove(file_path)
@@ -493,6 +496,66 @@ def delete_resume():
         flash("No resume found to delete.")
 
     return redirect(url_for('update_profile'))
+
+#recommended enhancements
+#api integration
+#get all jobs
+@app.route('/api/jobs', methods=['GET'])
+def api_jobs():
+    drives = PlacementDrive.query.filter_by(status='active').all()
+
+    data = []
+    for d in drives:
+        data.append({
+            "id": d.id,
+            "company": d.company_profile.company_name,
+            "title": d.job_title,
+            "eligibility": d.eligibility,
+            "deadline": d.deadline
+        })
+
+    return jsonify(data)
+
+#get student applications
+@app.route('/api/student/<int:id>/applications', methods=['GET'])
+def api_student_apps(id):
+    apps = Application.query.filter_by(student_id=id).all()
+
+    return jsonify([
+        {
+            "job": a.drive.job_title,
+            "company": a.drive.company_profile.company_name,
+            "status": a.status
+        } for a in apps
+    ])
+
+#post apply
+@app.route('/api/apply', methods=['POST'])
+def api_apply():
+    data = request.json
+
+    student_id = data.get('student_id')
+    drive_id = data.get('drive_id')
+
+    existing = Application.query.filter_by(student_id=student_id, drive_id=drive_id).first()
+    if existing:
+        return jsonify({"message": "Already applied"}), 400
+
+    app_obj = Application(student_id=student_id, drive_id=drive_id)
+    db.session.add(app_obj)
+    db.session.commit()
+
+    return jsonify({"message": "Application submitted"})
+
+#put update application
+@app.route('/api/application/<int:id>', methods=['PUT'])
+def api_update_application(id):
+    data = request.json
+    app_obj = Application.query.get_or_404(id)
+    app_obj.status = data.get('status')
+    db.session.commit()
+
+    return jsonify({"message": "Updated"})
 
 #to run
 if __name__ == '__main__':
