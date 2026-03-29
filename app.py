@@ -141,6 +141,7 @@ def admin_dashboard():
     total_companies = CompanyProfile.query.count()
     total_drives = PlacementDrive.query.count()
     total_applications = Application.query.count()
+    placed_count = Application.query.filter_by(status="Placed").count()
 
     return render_template('admin_dashboard.html', 
                             companies=companies, 
@@ -150,7 +151,8 @@ def admin_dashboard():
                             total_students=total_students,
                             total_companies=total_companies,
                             total_drives=total_drives,
-                            total_applications=total_applications)
+                            total_applications=total_applications,
+                            placed_count=placed_count)
 
 #approve company
 @app.route('/approve_company/<int:id>')
@@ -214,6 +216,7 @@ def search_students():
         (StudentProfile.phone.contains(query)) |
         (User.id == query if query.isdigit() else False)
     ).all()
+    placed_count = Application.query.filter_by(status="Placed").count()
 
     return render_template('admin_dashboard.html', students=students, 
         companies=CompanyProfile.query.all(),
@@ -222,7 +225,8 @@ def search_students():
         total_students=StudentProfile.query.count(),
         total_companies=CompanyProfile.query.count(),
         total_drives=PlacementDrive.query.count(),
-        total_applications=Application.query.count())
+        total_applications=Application.query.count(),
+        placed_count=placed_count)
 
 #search company
 @app.route('/search_companies')
@@ -235,6 +239,7 @@ def search_companies():
     companies = CompanyProfile.query.filter(
         CompanyProfile.company_name.contains(query)
     ).all()
+    placed_count = Application.query.filter_by(status="Placed").count()
 
     return render_template('admin_dashboard.html',
         students=StudentProfile.query.all(),
@@ -244,7 +249,8 @@ def search_companies():
         total_students=StudentProfile.query.count(),
         total_companies=CompanyProfile.query.count(),
         total_drives=PlacementDrive.query.count(),
-        total_applications=Application.query.count())
+        total_applications=Application.query.count(),
+        placed_count=placed_count)
 
 #deactivate user-------
 @app.route('/deactivate_user/<int:id>')
@@ -329,10 +335,18 @@ def company_dashboard():
         PlacementDrive.company_id == company.id
     ).all()
 
+    #chart data
+    job_titles = [d.job_title for d in drives]
+    application_counts = [
+    Application.query.filter_by(drive_id=d.id).count() for d in drives
+    ]
+    
     return render_template('company_dashboard.html',
                            company=company,
                            drives=drives,
-                           applications=applications)
+                           applications=applications,
+                           job_titles=job_titles,
+                           application_counts=application_counts)
 
 @app.route('/company/post_job', methods=['GET', 'POST'])
 def post_job():
@@ -417,8 +431,14 @@ def student_dashboard():
 
     #application history for this student
     history = Application.query.filter_by(student_id=student.id).all()
-
-    return render_template('stud_dashboard.html', student=student, drives=drives, history=history)
+    #chart data
+    status_labels = ["Applied", "Shortlisted", "Interview", "Selected", "Rejected", "Placed"]
+    status_counts = [
+    Application.query.filter_by(student_id=student.id, status=s).count()
+    for s in status_labels
+    ]
+    return render_template('stud_dashboard.html', student=student, drives=drives, history=history, status_labels=status_labels,
+                        status_counts=status_counts)
 
 #update student profile
 @app.route('/student/update_profile', methods=['GET', 'POST'])
@@ -556,6 +576,7 @@ def api_update_application(id):
     db.session.commit()
 
     return jsonify({"message": "Updated"})
+
 
 #to run
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Company Dasboard {% endblock %}
+{% block title %}Company Dashboard {% endblock %}
 
 {% block content %}
 <div class="container mt-3">
@@ -27,6 +27,14 @@
 
         <button type="submit" class="btn btn-primary">Add Job</button>
     </form>
+
+    <!--chart-->
+    <div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h5>Applications per Job</h5>
+        <canvas id="companyChart"></canvas>
+    </div>
+    </div>
 
     <!--jobs list-->
     <h5>Jobs</h5>
@@ -109,4 +117,31 @@
     {% endif %}
 
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctxCompany = document.getElementById('companyChart').getContext('2d');
+
+    const jobLabels = {{ job_titles | tojson }};
+    const appData = {{ application_counts | tojson }};
+    
+    if (jobLabels.length === 0) {
+    document.getElementById('companyChart').outerHTML = "<p class='text-muted'>No data available</p>";
+    } 
+    else {
+    new Chart(ctxCompany, {
+        type: 'bar',
+        data: {
+            labels: jobLabels,
+            datasets: [{
+                label: 'Applications',
+                data: appData,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        }
+    });
+    }
+</script>
 {% endblock %}

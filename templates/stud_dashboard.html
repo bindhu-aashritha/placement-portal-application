@@ -54,7 +54,16 @@
             </table>
         </div>
     </div>
-
+    <!--chart-->
+    <div class="card shadow-sm mb-5">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Application Status Overview</h5>
+    </div>
+    <div class="card-body">
+        <canvas id="studentChart"></canvas>
+    </div>
+    </div>
+     
     <div class="card shadow-sm mb-5">
         <div class="card-header bg-white">
             <h5 class="mb-0">Your Application History</h5>
@@ -97,4 +106,46 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctxStudent = document.getElementById('studentChart').getContext('2d');
+
+    const statusLabels = {{ status_labels | tojson }};
+    const statusCounts = {{ status_counts | tojson }};
+    if (statusCounts.every(v => v === 0)) {
+    document.getElementById('studentChart').outerHTML = 
+        "<p class='text-muted'>No application data</p>";
+    }else{
+    new Chart(ctxStudent, {
+        type: 'pie',
+        data: {
+            labels: statusLabels,
+            datasets: [{
+                data: statusCounts,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)',  //red
+                    'rgba(54, 162, 235, 0.7)',  //blue
+                    'rgba(255, 206, 86, 0.7)',  //yellow
+                    'rgba(75, 192, 192, 0.7)',  //teal
+                    'rgba(153, 102, 255, 0.7)', //purple
+                    'rgba(255, 159, 64, 0.7)'   //orange
+
+
+                ],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+}
+</script>
 {% endblock %}
