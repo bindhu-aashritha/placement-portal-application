@@ -38,6 +38,10 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email')
         pwd = request.form.get('password')
+
+        if not email or not pwd:
+            flash("All fields are required")
+            return redirect(url_for('login'))
         
         user = User.query.filter_by(email=email, password=pwd).first()
         
@@ -69,19 +73,46 @@ def logout():
 @app.route('/student/register', methods=['GET', 'POST'])
 def student_register():
     if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        phone = request.form['phone']
+        
+        if len(name) < 3:
+            flash("Name must be at least 3 characters")
+            return redirect(url_for('student_register'))
+        
+        if "@" not in email or "." not in email:
+            flash("Invalid email format")
+            return redirect(url_for('student_register'))
+        
+        if len(password) < 5:
+            flash("Password must be at least 5 characters")
+            return redirect(url_for('student_register'))
+
+        if not phone.isdigit() or len(phone) != 10:
+            flash("Phone must be 10 digits")
+            return redirect(url_for('student_register'))
+                
+        existing = User.query.filter_by(email=email).first()
+        if existing:
+            flash("Email already registered")
+            return redirect(url_for('student_register'))
+
         user = User(
-            name=request.form['name'],
-            email=request.form['email'],
-            password=request.form['password'],
+            name=name,
+            email=email,
+            password=password,
             role='student'
         )
         db.session.add(user)
         db.session.flush()
        
-        student_profile = StudentProfile(user_id=user.id, phone=request.form['phone'])
+        student_profile = StudentProfile(user_id=user.id, phone=phone)
         db.session.add(student_profile)
         db.session.commit()
 
+        flash("Registration successful")
         return redirect(url_for('login'))
 
     return render_template('stud_register.html')
@@ -90,10 +121,31 @@ def student_register():
 @app.route('/company/register', methods=['GET', 'POST'])
 def company_register():
     if request.method == 'POST':
+        company_name = request.form['company_name']
+        email = request.form['email']
+        password = request.form['password']
+
+        #validation code
+        if len(company_name) < 2:
+            flash("Company name too short")
+            return redirect(url_for('company_register'))
+
+        if "@" not in email or "." not in email:
+            flash("Invalid email")
+            return redirect(url_for('company_register'))
+
+        if len(password) < 5:
+            flash("Password must be at least 5 characters")
+            return redirect(url_for('company_register'))
+
+        existing = User.query.filter_by(email=email).first()
+        if existing:
+            flash("Email already exists")
+            return redirect(url_for('company_register'))
         user = User(
-            name=request.form['company_name'],
-            email=request.form['email'],
-            password=request.form['password'],
+            name=company_name,
+            email=email,
+            password=password,
             role='company'
         )
         db.session.add(user)
@@ -101,12 +153,13 @@ def company_register():
        
         company_profile = CompanyProfile(
             user_id=user.id,
-            company_name=request.form['company_name'],
+            company_name=company_name,
             is_approved=True
         )
         db.session.add(company_profile)
         db.session.commit()
 
+        flash("Company registered successfully")
         return redirect(url_for('login'))
 
     return render_template('company_register.html')
@@ -361,12 +414,34 @@ def post_job():
         return redirect(url_for('company_dashboard'))
 
     if request.method == 'POST':
+        job_title = request.form['job_title']
+        job_description = request.form['job_description']
+        eligibility = request.form['eligibility']
+        deadline = request.form['deadline']
+
+        #validation code
+        if len(job_title) < 3:
+            flash("Job title too short")
+            return redirect(url_for('company_dashboard'))
+        
+        if not job_description:
+            flash("Description required")
+            return redirect(url_for('company_dashboard'))
+
+        if not deadline:
+            flash("Deadline is required")
+            return redirect(url_for('company_dashboard'))
+
+        if "-" not in deadline:
+            flash("Use format DD-MM-YYYY")
+            return redirect(url_for('company_dashboard'))
+
         drive = PlacementDrive(
             company_id=company.id,
-            job_title=request.form['job_title'],
-            job_description=request.form['job_description'],
-            eligibility=request.form['eligibility'],
-            deadline=request.form['deadline'],
+            job_title=job_title,
+            job_description=job_description,
+            eligibility=eligibility,
+            deadline=deadline,
             status="pending"  
         )
 
@@ -449,6 +524,12 @@ def update_profile():
     student = StudentProfile.query.filter_by(user_id=session['user_id']).first()
 
     if request.method == 'POST':
+        phone = request.form.get('phone')
+
+        if phone and (not phone.isdigit() or len(phone) != 10):
+            flash("Invalid phone number")
+            return redirect(url_for('update_profile'))
+
         student.phone = request.form.get('phone')
         student.education = request.form.get('education')
         student.skills = request.form.get('skills')
@@ -556,6 +637,9 @@ def api_apply():
 
     student_id = data.get('student_id')
     drive_id = data.get('drive_id')
+
+    if not student_id or not drive_id:
+        return jsonify({"error": "Missing data"}), 400
 
     existing = Application.query.filter_by(student_id=student_id, drive_id=drive_id).first()
     if existing:

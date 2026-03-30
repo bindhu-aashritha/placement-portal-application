@@ -205,8 +205,13 @@
 
 <script>
 const ctx = document.getElementById('adminChart').getContext('2d');
-const platformData = {{ [total_students, total_companies, total_drives, total_applications, placed_count]|tojson }};
+const adminLabels = ['Students', 'Companies', 'Drives', 'Applications', 'Placements'];
+const platformData = {{ [total_students, total_companies, total_drives, total_applications, placed_count] | tojson }};
 
+if (adminData.every(value => value === 0)) {
+    document.getElementById('adminChart').outerHTML = "<p class='text-muted'>No data available</p>";
+} 
+else {
 new Chart(ctx, {
     type: 'bar',
     data: {
@@ -215,7 +220,16 @@ new Chart(ctx, {
             label: 'Platform Data',
             data: platformData
         }]
-    }
+    },
+    options: {
+        responsive: true,
+        plugins: {
+        legend: {
+                position: 'bottom',
+                }
+            }
+        }
 });
+}
 </script>
 {% endblock %}

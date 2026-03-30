@@ -45,5 +45,23 @@
     {% block content %} {% endblock %}
 </main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function validateForm(form) {
+    const email = form.email?.value;
+    const password = form.password?.value;
+
+    if (email && !email.includes("@")) {
+        alert("Invalid email format");
+        return false;
+    }
+
+    if (password && password.length < 5) {
+        alert("Password must be at least 5 characters");
+        return false;
+    }
+
+    return true;
+}
+</script>
 </body>
 </html>

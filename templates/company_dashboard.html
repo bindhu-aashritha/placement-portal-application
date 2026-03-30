@@ -15,15 +15,15 @@
 
     <!--posting job-->
     <h5>Post a Job</h5>
-    <form method="POST" action="{{ url_for('post_job') }}" class="mb-4">
+    <form method="POST" action="{{ url_for('post_job') }}" class="mb-4" onsubmit="return validateForm(this)">
 
-        <input type="text" name="job_title" class="form-control mb-2" placeholder="Enter job title" required>
+        <input type="text" name="job_title" class="form-control mb-2" placeholder="Enter job title" required minlength="3">
 
-        <textarea name="job_description" class="form-control mb-2" placeholder="Enter description"></textarea>
+        <textarea name="job_description" class="form-control mb-2" placeholder="Enter description" minlength="5"></textarea>
 
-        <input type="text" name="eligibility" class="form-control mb-2" placeholder="Eligibility (e.g. B.Tech CS)">
+        <input type="text" name="eligibility" class="form-control mb-2" placeholder="Eligibility (e.g. B.Tech CSE)">
 
-        <input type="text" name="deadline" class="form-control mb-2" placeholder="Deadline (dd-mm-yyyy)">
+        <input type="text" name="deadline" class="form-control mb-2" placeholder="Deadline (dd-mm-yyyy)" required pattern="\d{2}-\d{2}-\d{4}">
 
         <button type="submit" class="btn btn-primary">Add Job</button>
     </form>
@@ -140,6 +140,14 @@
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1
             }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+            legend: {
+                position: 'bottom',
+                }
+            }
         }
     });
     }

@@ -6,10 +6,10 @@
 <div class="container mt-5">
     <div class="card shadow-lg p-4 mx-auto" style="max-width: 500px; border-top: 5px solid #198754;">
     <h3 class="text-center mb-4">Company Registration</h3>
-    <form action="{{ url_for('company_register') }}" method="POST">
+    <form action="{{ url_for('company_register') }}" method="POST" onsubmit="return validateForm(this)">
         <div class="mb-3">
             <label class="form-label">Company Name</label>
-            <input type="text" name="company_name" class="form-control" required>
+            <input type="text" name="company_name" class="form-control" required minlength="2">
         </div>
         <div class="mb-3">
             <label class="form-label">Email Address</label>
@@ -17,7 +17,7 @@
         </div>
         <div class="mb-3">
             <label class="form-label">Password</label>
-            <input type="password" name="password" class="form-control" required>
+            <input type="password" name="password" class="form-control" required minlength="5">
         </div>
         <div class="mb-3">
             <label class="form-label">Website URL</label>

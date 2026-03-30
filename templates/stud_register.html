@@ -6,10 +6,10 @@
 <div class="container mt-5">
     <div class="card shadow p-4 mx-auto" style="max-width: 450px;">
         <h2 class="text-center">Student Registration</h2>
-        <form action="/student/register" method="POST">
-            <input type="text" name="name" class="form-control mb-3" placeholder="Full Name" required>
+        <form action="/student/register" method="POST" onsubmit="return validateForm(this)">
+            <input type="text" name="name" class="form-control mb-3" placeholder="Full Name" required minlength="3">
             <input type="email" name="email" class="form-control mb-3" placeholder="Email" required>
-            <input type="password" name="password" class="form-control mb-3" placeholder="Password" required>
+            <input type="password" name="password" class="form-control mb-3" placeholder="Password" required minlength="5">
             <input type="text" name="phone" class="form-control mb-3" placeholder="Phone Number" required>
             <button type="submit" class="btn btn-primary w-100">Register</button>
         </form>
