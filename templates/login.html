@@ -3,23 +3,33 @@
 {% block title %}Login Page {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow p-4 mx-auto" style="max-width: 400px;">
-        <h1 class="h3 text-center mb-4">Login</h1>
+<div class="container mt-4">
+    <div class="card shadow p-4 mx-auto" style="max-width: 500px; background-color: #ffffff;">
+        <h2 class="text-center fw-bold mb-4 text-dark">Login</h2> <br> <br>
         <form action="/login" method="POST">
             <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
-            </div>
+                <label class="form-label" for="email">Enter Email:</label>
+                <input type="email" name="email" class="form-control" id="email" placeholder="abcd@gmail.com" required>
+            </div> <br>
             <div class="mb-3">
-                <label class="form-label">Password</label>
-                <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+                <label class="form-label">Enter Password:</label>
+                <input type="password" name="password" class="form-control" placeholder="Password" required>
+            </div> <br>
+            <div class="mb-4">
+            <label for="role" class="form-label">Select Role:</label>
+            <select class="form-select" id="role" name="role" required>
+            <option value="" disabled selected>Student</option>
+            <option value="student">Student</option>
+            <option value="company">Company</option>
+            <option value="admin">Admin</option>
+            </select>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+            <button type="submit" class="btn btn-form-submit w-100 fw-bold py-2 mt-2">Login</button> <br> <br>
         </form>
-        <div class="text-center mt-3 small">
-            Student register <a href="{{ url_for('student_register') }}">Register</a><br>
-            Company register <a href="{{ url_for('company_register') }}">Register</a>
+        <div class="text-center mt-4 small">
+            Don't have an account? <br> <br>
+            For Student:      <a href="{{ url_for('student_register') }}" class="text-decoration-underline fw-bold me-2">Register here</a><br>
+            For Company:      <a href="{{ url_for('company_register') }}" class="text-decoration-underline fw-bold me-2">Register here</a>
         </div>
     </div>
 </div>

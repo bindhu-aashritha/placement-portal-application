@@ -3,17 +3,40 @@
 {% block title %}Student Register {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow p-4 mx-auto" style="max-width: 450px;">
-        <h2 class="text-center">Student Registration</h2>
-        <form action="/student/register" method="POST" onsubmit="return validateForm(this)">
-            <input type="text" name="name" class="form-control mb-3" placeholder="Full Name" required minlength="3">
-            <input type="email" name="email" class="form-control mb-3" placeholder="Email" required>
-            <input type="password" name="password" class="form-control mb-3" placeholder="Password" required minlength="5">
-            <input type="text" name="phone" class="form-control mb-3" placeholder="Phone Number" required>
-            <button type="submit" class="btn btn-primary w-100">Register</button>
-        </form>
-        <p class="text-center mt-3 small">Already registered? <a href="/login">Login here</a></p>
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-7 col-lg-5">
+        <div class="card shadow p-4">
+        <h2 class="text-center fw-bold mb-4 text-dark">Student Registration</h2> <br><br>
+        <form action="{{ url_for('student_register') }}" method="POST" onsubmit="return validateForm(this)">
+        <div class="mb-3">
+            <label class="form-label">Enter Your Name:</label>
+            <input type="text" name="name" placeholder="Full name" class="form-control" required minlength="3">
+        </div> <br>
+        <div class="mb-3">
+            <label class="form-label">Enter Your Email:</label>
+            <input type="email" name="email" placeholder="abcd@gmail.com" class="form-control" required>
+        </div> <br>
+        <div class="mb-3">
+            <label class="form-label">Enter Password:</label>
+            <input type="password" name="password" placeholder="Password" class="form-control" required minlength="5">
+        </div> <br>
+        <div class="mb-3">
+            <label class="form-label">Enter Phone Number:</label>
+            <input type="text" name="phone" placeholder="Phone number" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-form-submit w-100 fw-bold py-2 mt-2">Create Account</button>
+    </form>
+        <!-- <form action="/student/register" method="POST" onsubmit="return validateForm(this)">
+            Enter your name: <input type="text" name="name" class="form-control mb-3" placeholder="Full Name" required minlength="3">
+            Enter your email: <input type="email" name="email" class="form-control mb-3" placeholder="Email" required>
+            Enter your password: <input type="password" name="password" class="form-control mb-3" placeholder="Password" required minlength="5">
+             Enter phone number: <input type="text" name="phone" class="form-control mb-3" placeholder="Phone Number" required>
+            <button type="submit" class="btn btn-primary w-100">Create Account</button>
+        </form> -->
+        <p class="text-center mt-3 small">Already registered? <a href="{{ url_for('login') }}" class="text-decoration-underline fw-bold me-2">Login here</a></p>
+        </div>
+        </div>
     </div>
 </div>
 {% endblock %}

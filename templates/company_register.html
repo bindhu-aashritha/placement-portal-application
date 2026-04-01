@@ -3,30 +3,34 @@
 {% block title %}Company Registration{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow-lg p-4 mx-auto" style="max-width: 500px; border-top: 5px solid #198754;">
-    <h3 class="text-center mb-4">Company Registration</h3>
+<div class="container mt-3">
+    <div class="row justify-content-center">
+    <div class="col-12 col-md-7 col-lg-5">
+    <div class="card shadow p-4">
+    <h2 class="text-center fw-bold mb-4 text-dark">Company Registration</h2> <br><br>
     <form action="{{ url_for('company_register') }}" method="POST" onsubmit="return validateForm(this)">
         <div class="mb-3">
-            <label class="form-label">Company Name</label>
-            <input type="text" name="company_name" class="form-control" required minlength="2">
-        </div>
+            <label class="form-label">Enter Company Name:</label>
+            <input type="text" name="company_name" placeholder="Full name" class="form-control" required minlength="2">
+        </div> <br>
         <div class="mb-3">
-            <label class="form-label">Email Address</label>
-            <input type="email" name="email" class="form-control" required>
-        </div>
+            <label class="form-label">Enter Email Address:</label>
+            <input type="email" name="email" placeholder="abcd@gmail.com" class="form-control" required>
+        </div> <br>
         <div class="mb-3">
-            <label class="form-label">Password</label>
-            <input type="password" name="password" class="form-control" required minlength="5">
-        </div>
+            <label class="form-label">Enter Password:</label>
+            <input type="password" name="password" placeholder="Password" class="form-control" required minlength="5">
+        </div> <br>
         <div class="mb-3">
-            <label class="form-label">Website URL</label>
+            <label class="form-label">Enter Website URL:</label>
             <input type="url" name="website" class="form-control" placeholder="https://example.com">
-        </div>
-        <button type="submit" class="btn btn-success w-100">Create Company Account</button>
+        </div> <br>
+        <button type="submit" class="btn btn-form-submit w-100 fw-bold py-2 mt-2">Create Company Account</button>
     </form>
     <div class="text-center mt-3">
-    <small>Already registered? <a href="{{ url_for('login') }}">Login here</a></small>
+    <small>Already registered? <a href="{{ url_for('login') }}" class="text-decoration-underline fw-bold me-2">Login here</a></small>
+    </div>
+    </div>
     </div>
     </div>
 </div>
