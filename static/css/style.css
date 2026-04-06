@@ -1,6 +1,6 @@
 body {
     background-color: #bce1fa;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 .top-header {
     padding: 30px 50px;
@@ -100,10 +100,6 @@ nav a:hover {
 .container {
     margin-top: 20px;
 }
-h2, h3 {
-    margin-bottom: 15px;
-    font-weight: 600;
-}
 .welcome-line {
     color: #8205d6
 }
@@ -119,8 +115,8 @@ h2, h3 {
     background-color: #424242;
     color: #ffffff;
 }
-.search-group .form-control,
-.search-group .btn {
+.search-group .form-control
+{
   height: 48px;
   padding: 0 16px;
   display: flex;

@@ -1,0 +1,68 @@
+openapi: 3.0.0
+info:
+  title: Placement Portal API
+  description: API for managing job applications and placement drives.
+  version: 1.0.0
+
+paths:
+  /api/jobs:
+    get:
+      summary: Get all active jobs
+      responses:
+        '200':
+          description: List of active placement drives
+
+  /api/student/{id}/applications:
+    get:
+      summary: Get application history of student
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of jobs student has applied
+
+  /api/apply:
+    post:
+      summary: Apply for a job
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                student_id:
+                  type: integer
+                drive_id:
+                  type: integer
+      responses:
+        '200':
+          description: Application submitted successfully.
+        '400':
+          description: Data missing or already applied.
+
+  /api/application/{id}:
+    put:
+      summary: Update application status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+      responses:
+        '200':
+          description: Successfully updated status

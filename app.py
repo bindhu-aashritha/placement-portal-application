@@ -154,7 +154,7 @@ def company_register():
         company_profile = CompanyProfile(
             user_id=user.id,
             company_name=company_name,
-            is_approved=True
+            is_approved=False
         )
         db.session.add(company_profile)
         db.session.commit()
