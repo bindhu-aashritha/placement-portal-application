@@ -40,8 +40,8 @@ class PlacementDrive(db.Model):
     job_title = db.Column(db.String(100), nullable=False)
     job_description = db.Column(db.Text)
     eligibility = db.Column(db.String(100))
-    deadline = db.Column(db.String(50))
-    status = db.Column(db.String(20), default="pending")
+    deadline = db.Column(db.DateTime)
+    status = db.Column(db.String(20), default="Pending")
     
     applications = db.relationship('Application', backref='drive', lazy=True)
 
@@ -50,7 +50,7 @@ class Application(db.Model):
     student_id = db.Column(db.Integer, db.ForeignKey('student_profile.id'), nullable=False)
     drive_id = db.Column(db.Integer, db.ForeignKey('placement_drive.id'), nullable=False)
     application_date = db.Column(db.DateTime, default=datetime.utcnow)
-    status = db.Column(db.String(50), default="applied")
+    status = db.Column(db.String(50), default="Applied")
 
     __table_args__ = (
         db.UniqueConstraint('student_id', 'drive_id', name='unique_application_per_drive'),

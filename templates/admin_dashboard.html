@@ -56,13 +56,13 @@
 
 <div class="row g-3 mb-5">
     <div class="col-md-6">
-        <form action="/search_students" class="input-group">
+        <form action="{{ url_for('search_students') }}" class="input-group">
             <input type="text" name="q" class="form-control" placeholder="Search students...">
             <button class="btn btn-dark px-4" type="submit">Search</button>
         </form>
     </div>
     <div class="col-md-6">
-        <form action="/search_companies" class="input-group">
+        <form action="{{ url_for('search_companies') }}" class="input-group">
             <input type="text" name="q" class="form-control" placeholder="Search companies...">
             <button class="btn btn-dark px-4" type="submit">Search</button>
         </form>
@@ -90,8 +90,8 @@
                     <td>{{ s.user.name }}</td>
                     <td>{{ s.phone }}</td>
                     <td>
-                        <a href="/deactivate_user/{{ s.user.id }}" class="btn btn-sm btn-warning">Deactivate</a>
-                        <a href="/delete_student/{{ s.id }}" class="btn btn-sm btn-danger">Delete</a>
+                        <a href="{{ url_for('deactivate_user', id=s.user.id) }}" class="btn btn-sm btn-warning">Deactivate</a>
+                        <a href="{{ url_for('delete_student', id=s.id) }}" class="btn btn-sm btn-danger">Delete</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -130,10 +130,10 @@
                     </td>
                     <td>
                         <div class="btn-group">
-                            <a href="/approve_company/{{ c.id }}" class="btn btn-sm btn-outline-success">Approve</a>
-                            <a href="/reject_company/{{ c.id }}" class="btn btn-sm btn-outline-warning">Reject</a>
-                            <a href="/deactivate_user/{{ c.user.id }}" class="btn btn-sm btn-outline-dark">Deactivate</a>
-                            <a href="/delete_company/{{ c.id }}" class="btn btn-sm btn-outline-danger">Delete</a>
+                            <a href="{{ url_for('approve_company', id=c.id) }}" class="btn btn-sm btn-outline-success">Approve</a>
+                            <a href="{{ url_for('reject_company', id=c.id) }}" class="btn btn-sm btn-outline-warning">Reject</a>
+                            <a href="{{ url_for('deactivate_user', id=c.user.id) }}" class="btn btn-sm btn-outline-dark">Deactivate</a>
+                            <a href="{{ url_for('delete_company', id=c.id) }}" class="btn btn-sm btn-outline-danger">Delete</a>
                         </div>
                     </td>
                 </tr>
@@ -168,9 +168,9 @@
                     <td>{{ d.job_title }}</td>
                     <td><span class="badge rounded-pill bg-info text-dark">{{ d.status }}</span></td>
                     <td>
-                        <a href="/approve_drive/{{ d.id }}" class="btn btn-sm btn-success">Approve</a>
-                        <a href="/reject_drive/{{ d.id }}" class="btn btn-sm btn-warning">Reject</a>
-                        <a href="/delete_drive/{{ d.id }}" class="btn btn-sm btn-danger">Delete</a>
+                        <a href="{{ url_for('approve_drive', id=d.id) }}" class="btn btn-sm btn-success">Approve</a>
+                        <a href="{{ url_for('reject_drive', id=d.id) }}" class="btn btn-sm btn-warning">Reject</a>
+                        <a href="{{ url_for('delete_drive', id=d.id) }}" class="btn btn-sm btn-danger">Delete</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -204,7 +204,7 @@
                     <td>{{ a.drive.job_title }}</td>
                     <td>{{ a.status }}</td>
                     <td>
-                        <a href="/delete_application/{{ a.id }}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        <a href="{{ url_for('delete_application', id=a.id) }}" class="btn btn-sm btn-outline-danger">Delete</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -216,7 +216,7 @@
 </div>
 
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>

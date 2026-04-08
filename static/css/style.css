@@ -10,7 +10,6 @@ body {
 }
 .top-header h1 {
     margin: 0 0 10px 0;
-    color:rgba(232, 111, 4, 0.08);
 }
 .navbar {
     margin-bottom: 20px;
@@ -49,7 +48,7 @@ nav a:hover {
 .admin-card {
     background-color: #99d0f4; 
 }
-.btn {
+.btn{
     padding: 10px 20px;
     border: none;
     border-radius: 6px;
@@ -98,7 +97,7 @@ nav a:hover {
     border-radius: 8px;
 }
 .container {
-    margin-top: 20px;
+    margin-top: 10px;
 }
 .welcome-line {
     color: #8205d6
@@ -121,9 +120,6 @@ nav a:hover {
   padding: 0 16px;
   display: flex;
   align-items: center;
-}
-
-.search-group .form-control {
   border-right: none;
 }
 

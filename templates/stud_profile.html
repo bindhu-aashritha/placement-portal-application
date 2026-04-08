@@ -6,7 +6,7 @@
 <div class="container mt-5">
     <div class="card shadow-sm p-4 mx-auto" style="max-width: 600px;">
         <h3>Update Profile</h3>
-        <form action="/student/update_profile" method="POST" enctype="multipart/form-data">
+        <form action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data">
             <div class="mb-3">
                 <label class="form-label">Educational Qualification</label>
                 <input type="text" name="education" class="form-control" placeholder="e.g. B.Tech CSE" value="{{ student.education or '' }}">
@@ -38,7 +38,7 @@
             </div>
             <button type="submit" class="btn btn-primary w-100">Save Changes</button>
         </form>
-        <div class="text-center mt-3"><a href="/dashboard">Go to Dashboard</a></div>
+        <div class="text-center mt-3"><a href="{{ url_for('dashboard') }}">Go to Dashboard</a></div>
     </div>
 </div>
 {% endblock %}

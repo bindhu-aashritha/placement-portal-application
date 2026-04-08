@@ -22,7 +22,8 @@
 
         <input type="text" name="eligibility" class="form-control mb-2" placeholder="Eligibility (e.g. B.Tech CSE)">
 
-        <input type="text" name="deadline" class="form-control mb-2" placeholder="Deadline (dd-mm-yyyy)" required pattern="\d{2}-\d{2}-\d{4}"> <br>
+        <input type="date" name="deadline" class="form-control mb-2" required> <br>
+        <small class="text-muted">Deadline</small>
 
         <button type="submit" class="btn btn-primary">Add Job</button>
     </form>
@@ -60,14 +61,14 @@
         <tr>
             <td>{{ d.job_title }}</td>
             <td>{{ d.eligibility }}</td>
-            <td>{{ d.deadline }}</td>
+            <td>{{ d.deadline.strftime('%Y-%m-%d') if d.deadline else '' }}</td>
 
             <td>
-                {% if d.status == "active" %}
+                {% if d.status == "Active" %}
                    <span class="badge bg-success">Active</span>
-                {% elif d.status == "closed" %}
+                {% elif d.status == "Closed" %}
                    <span class="badge bg-danger">Closed</span>
-                {% elif d.status == "pending" %}
+                {% elif d.status == "Pending" %}
                    <span class="badge bg-warning text-dark">Pending Approval</span>
                 {% else %}
                    <span class="badge bg-secondary">{{ d.status }}</span>

@@ -14,7 +14,7 @@
             <p class="text-muted">View the latest placement drives.</p>
         </div>
         <div class="col-md-4 text-end">
-            <a href="/student/update_profile" class="btn btn-primary">Update Profile or Resume</a>
+            <a href="{{ url_for('update_profile') }}" class="btn btn-primary">Update Profile or Resume</a>
         </div>
     </div>
 
@@ -23,7 +23,7 @@
             <h5 class="mb-0">Job postings available</h5>
         </div>
         <div class="card-body">
-        <form action="/search_jobs" method="GET" class="mb-4">
+        <form method="GET" action="{{ url_for('student_dashboard') }}" class="mb-4">
   <div class="input-group shadow-sm search-group">
     <input type="text" name="q" class="form-control"
            placeholder="Search by Company, Position, or Skills">
@@ -31,7 +31,7 @@
   </div>
 </form>
         </div>
-        <div class="table-responsiveness">
+        <div class="table-responsive">
             <table class="table table-hover">
                 <thead class="table-light">
                     <tr>
@@ -48,7 +48,7 @@
                         <td>{{ drive.job_title }}</td>
                         <td>{{ drive.eligibility }}</td>
                         <td>
-                            <a href="/apply/{{ drive.id }}" class="btn btn-success btn-sm">Apply Now</a>
+                            <a href="{{ url_for('apply_job', drive_id=drive.id) }}" class="btn btn-success btn-sm">Apply Now</a>
                         </td>
                     </tr>
                     {% else %}

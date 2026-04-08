@@ -3,6 +3,8 @@ from model import db
 from flask import render_template, redirect, url_for, session, request, flash
 from model import User, CompanyProfile, StudentProfile, PlacementDrive, Application
 from flask import jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ppa.db'
@@ -23,7 +25,7 @@ with app.app_context():
     db.create_all()
     admin_exists = User.query.filter_by(role='admin').first()
     if not admin_exists:
-        admin = User(name="Admin", email="admin@gmail.com", password="admin1", role="admin")
+        admin = User(name="Admin", email="admin@gmail.com", password=generate_password_hash("admin1"), role="admin")
         db.session.add(admin)
         db.session.commit()
 
@@ -38,25 +40,28 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email')
         pwd = request.form.get('password')
+        role = request.form.get('role')
 
         if not email or not pwd:
             flash("All fields are required")
             return redirect(url_for('login'))
         
-        user = User.query.filter_by(email=email, password=pwd).first()
-        
-        if not user:
+        user = User.query.filter_by(email=email).first()
+        if not user or not check_password_hash(user.password, pwd):
             flash("Invalid credentials.")
+            return redirect(url_for('login'))
+        
+        if user.role != role:
+            flash("Wrong role selected.")
             return redirect(url_for('login'))
         
         if not user.is_active:
             flash("Account deactivated by Admin.")
             return redirect(url_for('login'))
 
-        if user.role == 'company':
-            if not user.company_profile.is_approved:
-                flash("Company pending admin approval.")
-                return redirect(url_for('login'))
+        if user.role == 'company' and not user.company_profile.is_approved:
+            flash("Company pending admin approval.")
+            return redirect(url_for('login'))
 
         session['user_id'] = user.id
         session['role'] = user.role
@@ -98,11 +103,12 @@ def student_register():
         if existing:
             flash("Email already registered")
             return redirect(url_for('student_register'))
-
+        
+        hashed_password=generate_password_hash(password)
         user = User(
             name=name,
             email=email,
-            password=password,
+            password=hashed_password,
             role='student'
         )
         db.session.add(user)
@@ -142,18 +148,22 @@ def company_register():
         if existing:
             flash("Email already exists")
             return redirect(url_for('company_register'))
+        
+        hashed_password = generate_password_hash(password)
         user = User(
             name=company_name,
             email=email,
-            password=password,
+            password=hashed_password,
             role='company'
         )
         db.session.add(user)
         db.session.flush()
-       
+
+        website=request.form.get('website')
         company_profile = CompanyProfile(
             user_id=user.id,
             company_name=company_name,
+            website=website,
             is_approved=False
         )
         db.session.add(company_profile)
@@ -238,7 +248,7 @@ def approve_drive(id):
         return redirect(url_for('login'))
 
     drive = PlacementDrive.query.get_or_404(id)
-    drive.status = "active"
+    drive.status = "Active"
     db.session.commit()
 
     return redirect(url_for('admin_dashboard'))
@@ -250,7 +260,7 @@ def reject_drive(id):
         return redirect(url_for('login'))
 
     drive = PlacementDrive.query.get_or_404(id)
-    drive.status = "rejected"
+    drive.status = "Rejected"
     db.session.commit()
 
     return redirect(url_for('admin_dashboard'))
@@ -417,7 +427,12 @@ def post_job():
         job_title = request.form['job_title']
         job_description = request.form['job_description']
         eligibility = request.form['eligibility']
-        deadline = request.form['deadline']
+        deadline_str = request.form['deadline']
+        try:
+            deadline = datetime.strptime(deadline_str, "%Y-%m-%d")  
+        except:
+            flash("Invalid date format")
+            return redirect(url_for('company_dashboard'))
 
         #validation code
         if len(job_title) < 3:
@@ -432,17 +447,13 @@ def post_job():
             flash("Deadline is required")
             return redirect(url_for('company_dashboard'))
 
-        if "-" not in deadline:
-            flash("Use format DD-MM-YYYY")
-            return redirect(url_for('company_dashboard'))
-
         drive = PlacementDrive(
             company_id=company.id,
             job_title=job_title,
             job_description=job_description,
             eligibility=eligibility,
             deadline=deadline,
-            status="pending"  
+            status="Pending"  
         )
 
         db.session.add(drive)
@@ -460,10 +471,10 @@ def update_job_status(id):
 
     drive = PlacementDrive.query.get_or_404(id)
 
-    if drive.status == "active":
-        drive.status = "closed"
+    if drive.status == "Active":
+        drive.status = "Closed"
     else:
-        drive.status = "active"
+        drive.status = "Active"
 
     db.session.commit()
     return redirect(url_for('company_dashboard'))
@@ -474,6 +485,10 @@ def update_application(id, status):
         return redirect(url_for('login'))
 
     application = Application.query.get_or_404(id)
+    user_id = session.get('user_id')
+    company = CompanyProfile.query.filter_by(user_id=user_id).first()
+    if application.drive.company_id != company.id:
+        return "Unauthorized", 403
     valid_status = ["Applied", "Shortlisted", "Interview", "Selected", "Rejected", "Placed"]
 
     if status in valid_status:
@@ -496,13 +511,13 @@ def student_dashboard():
     if query:
         # Search by job title, company, or skills
         drives = PlacementDrive.query.join(CompanyProfile).filter(
-            PlacementDrive.status == 'active',
+            PlacementDrive.status == 'Active',
             (PlacementDrive.job_title.contains(query)) |
             (CompanyProfile.company_name.contains(query)) |
             (PlacementDrive.job_description.contains(query))
         ).all()
     else:
-        drives = PlacementDrive.query.filter_by(status='active').all()
+        drives = PlacementDrive.query.filter_by(status='Active').all()
 
     #application history for this student
     history = Application.query.filter_by(student_id=student.id).all()
@@ -556,6 +571,16 @@ def apply_job(drive_id):
     
     student = StudentProfile.query.filter_by(user_id=session['user_id']).first()
     
+    drive = PlacementDrive.query.get_or_404(drive_id)
+    if drive.status != "Active":
+        flash("This drive is not open for applications.")
+        return redirect(url_for('student_dashboard'))
+
+    from datetime import datetime
+    if drive.deadline and drive.deadline < datetime.utcnow():
+        flash("Application deadline has passed.")
+        return redirect(url_for('student_dashboard'))
+    
     #check if applied already
     existing = Application.query.filter_by(student_id=student.id, drive_id=drive_id).first()
     if existing:
@@ -603,7 +628,7 @@ def delete_resume():
 #get all jobs
 @app.route('/api/jobs', methods=['GET'])
 def api_jobs():
-    drives = PlacementDrive.query.filter_by(status='active').all()
+    drives = PlacementDrive.query.filter_by(status='Active').all()
 
     data = []
     for d in drives:

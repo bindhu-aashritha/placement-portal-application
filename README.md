@@ -1,11 +1,11 @@
 # Placement Portal Application
-## A role-based web application designed for managing placement cycles of institutions.
+## Web application designed for institutions to manage placements with role-based login and dashboards. It provides an easy way to select, reject and shortlist students for companies. It also gives clear information to students about available placement drives, companies and status of their application. Admin can supervise the process and also select or reject companies and students when required.
 
 ## Issues encountered and solutions
 ## Milestone 0: GitHub Setup
 
-### Issues: README not displaying properly and didn't include all required files in .gitignore.
-### Solution: Properly added files and learnt correct Git commands.
+### Issues: README was not displaying on github and didn't include all required files in .gitignore.
+### Solution: Added files properly and learnt correct Git commands.
 
 ## Milestone: Database Models and Schema Setup
 
@@ -51,6 +51,6 @@
 
 ## Milestone: Responsive UI
 
-### Issues: CSS conflicting with bootstrap and misalignement of components.
+### Issues: CSS was conflicting with bootstrap and components were not aligning.
 ### Solution: Adjusted use of Bootstrap grid/flex and avoided overriding default styles by use of important.
 
