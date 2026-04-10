@@ -79,6 +79,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Name</th>
+                    <th>Resume</th>
                     <th>Phone</th>
                     <th>Action</th>
                 </tr>
@@ -88,10 +89,22 @@
                 <tr>
                     <td>{{ s.id }}</td>
                     <td>{{ s.user.name }}</td>
-                    <td>{{ s.phone }}</td>
                     <td>
-                        <a href="{{ url_for('deactivate_user', id=s.user.id) }}" class="btn btn-sm btn-warning">Deactivate</a>
-                        <a href="{{ url_for('delete_student', id=s.id) }}" class="btn btn-sm btn-danger">Delete</a>
+                        {% if s.resume %}
+                        <a href="{{ url_for('static', filename='resumes/' + s.resume) }}" target="_blank" class="btn btn-sm btn-link p-0">View PDF</a>
+                        {% else %}
+                        <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ s.user.phone if s.user.phone else s.phone }}</td>
+                    <td>
+                        <a href="{{ url_for('deactivate_user', id=s.user.id) }}" class="btn btn-sm btn-dark">Deactivate</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td class="text-center py-4">
+                    <p class="mb-0 text-muted">No results found</p>
                     </td>
                 </tr>
                 {% endfor %}
@@ -129,12 +142,15 @@
                         {% endif %}
                     </td>
                     <td>
-                        <div class="btn-group">
-                            <a href="{{ url_for('approve_company', id=c.id) }}" class="btn btn-sm btn-outline-success">Approve</a>
-                            <a href="{{ url_for('reject_company', id=c.id) }}" class="btn btn-sm btn-outline-warning">Reject</a>
-                            <a href="{{ url_for('deactivate_user', id=c.user.id) }}" class="btn btn-sm btn-outline-dark">Deactivate</a>
-                            <a href="{{ url_for('delete_company', id=c.id) }}" class="btn btn-sm btn-outline-danger">Delete</a>
-                        </div>
+                        <a href="{{ url_for('approve_company', id=c.id) }}" class="btn btn-sm btn-success">Approve</a>
+                        <a href="{{ url_for('reject_company', id=c.id) }}" class="btn btn-sm btn-warning">Reject</a>
+                        <a href="{{ url_for('deactivate_user', id=c.user.id) }}" class="btn btn-sm btn-dark">Deactivate</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td class="text-center py-4">
+                    <p class="mb-0 text-muted">No results found</p>
                     </td>
                 </tr>
                 {% endfor %}
@@ -165,12 +181,14 @@
                 <tr>
                     <td>{{ d.id }}</td>
                     <td>{{ d.company_profile.company_name }}</td>
-                    <td>{{ d.job_title }}</td>
+                    <td>{{ d.job_title }}
+                        <br><small class="text-muted">{{ d.eligibility }}</small>
+                        <small class="text-muted">{{ d.job_description[:60] }}</small> </td>
+                    </td>
                     <td><span class="badge rounded-pill bg-info text-dark">{{ d.status }}</span></td>
                     <td>
                         <a href="{{ url_for('approve_drive', id=d.id) }}" class="btn btn-sm btn-success">Approve</a>
                         <a href="{{ url_for('reject_drive', id=d.id) }}" class="btn btn-sm btn-warning">Reject</a>
-                        <a href="{{ url_for('delete_drive', id=d.id) }}" class="btn btn-sm btn-danger">Delete</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -193,7 +211,6 @@
                     <th>Student</th>
                     <th>Drive</th>
                     <th>Status</th>
-                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -203,9 +220,6 @@
                     <td>{{ a.student_profile.user.name }}</td>
                     <td>{{ a.drive.job_title }}</td>
                     <td>{{ a.status }}</td>
-                    <td>
-                        <a href="{{ url_for('delete_application', id=a.id) }}" class="btn btn-sm btn-outline-danger">Delete</a>
-                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

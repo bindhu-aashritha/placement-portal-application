@@ -28,7 +28,6 @@ class CompanyProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     company_name = db.Column(db.String(100), nullable=False)
-    hr_contact = db.Column(db.String(100))
     website = db.Column(db.String(100))
     is_approved = db.Column(db.Boolean, default=False)
     

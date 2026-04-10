@@ -272,13 +272,12 @@ def search_students():
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
 
-    query = request.args.get('q', '')
+    query = request.args.get('q', '').strip()
 
-    students = StudentProfile.query.join(User).filter(
-        (User.name.contains(query)) |
-        (StudentProfile.phone.contains(query)) |
-        (User.id == query if query.isdigit() else False)
-    ).all()
+    search_filter = (User.name.ilike(f'%{query}%')) | (StudentProfile.phone.ilike(f'%{query}%'))
+    if query.isdigit():
+        search_filter = search_filter | (User.id == int(query))
+    students = StudentProfile.query.join(User).filter(search_filter).all()
     placed_count = Application.query.filter_by(status="Placed").count()
 
     return render_template('admin_dashboard.html', students=students, 
@@ -297,10 +296,10 @@ def search_companies():
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
 
-    query = request.args.get('q', '')
+    query = request.args.get('q', '').strip()
 
     companies = CompanyProfile.query.filter(
-        CompanyProfile.company_name.contains(query)
+        CompanyProfile.company_name.ilike(f'%{query}%')
     ).all()
     placed_count = Application.query.filter_by(status="Placed").count()
 
@@ -337,50 +336,6 @@ def activate_user(id):
     user.is_active = True
     db.session.commit()
 
-    return redirect(url_for('admin_dashboard'))
-
-#delete
-@app.route('/delete_student/<int:id>')
-def delete_student(id):
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-
-    student = StudentProfile.query.get_or_404(id)
-    db.session.delete(student)
-    db.session.commit()
-    return redirect(url_for('admin_dashboard'))
-
-
-@app.route('/delete_company/<int:id>')
-def delete_company(id):
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-
-    company = CompanyProfile.query.get_or_404(id)
-    db.session.delete(company)
-    db.session.commit()
-    return redirect(url_for('admin_dashboard'))
-
-
-@app.route('/delete_drive/<int:id>')
-def delete_drive(id):
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-
-    drive = PlacementDrive.query.get_or_404(id)
-    db.session.delete(drive)
-    db.session.commit()
-    return redirect(url_for('admin_dashboard'))
-
-
-@app.route('/delete_application/<int:id>')
-def delete_application(id):
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-
-    app_obj = Application.query.get_or_404(id)
-    db.session.delete(app_obj)
-    db.session.commit()
     return redirect(url_for('admin_dashboard'))
 
 #company dashboard routes
@@ -508,16 +463,16 @@ def student_dashboard():
     student = StudentProfile.query.filter_by(user_id=user_id).first()
     
     query = request.args.get('q', '')
+    drive_query = PlacementDrive.query.filter_by(status='Active')
     if query:
         # Search by job title, company, or skills
-        drives = PlacementDrive.query.join(CompanyProfile).filter(
-            PlacementDrive.status == 'Active',
-            (PlacementDrive.job_title.contains(query)) |
-            (CompanyProfile.company_name.contains(query)) |
-            (PlacementDrive.job_description.contains(query))
+        drives = drive_query.join(CompanyProfile).filter(
+            (PlacementDrive.job_title.ilike(f'%{query}%')) |
+            (CompanyProfile.company_name.ilike(f'%{query}%')) |
+            (PlacementDrive.job_description.ilike(f'%{query}%'))
         ).all()
     else:
-        drives = PlacementDrive.query.filter_by(status='Active').all()
+        drives = drive_query.all()
 
     #application history for this student
     history = Application.query.filter_by(student_id=student.id).all()
@@ -593,35 +548,6 @@ def apply_job(drive_id):
     
     flash("Applied successfully")
     return redirect(url_for('student_dashboard'))
-
-#to delete resume
-@app.route('/student/delete_resume')
-def delete_resume():
-    if session.get('role') != 'student':
-        return redirect(url_for('login'))
-
-    student = StudentProfile.query.filter_by(user_id=session['user_id']).first()
-
-    if student and student.resume:
-        #constructing full path to file
-        file_path = os.path.join(app.root_path, 'static/resumes', student.resume)
-
-        #deleting physical file from the folder
-        try:
-            if os.path.exists(file_path):
-                os.remove(file_path)
-            
-            # 3. Clear the filename from the database
-            student.resume = None
-            db.session.commit()
-            flash("Resume deleted successfully.")
-        except Exception as e:
-            db.session.rollback()
-            flash("Error deleting file from storage.")
-    else:
-        flash("No resume found to delete.")
-
-    return redirect(url_for('update_profile'))
 
 #recommended enhancements
 #api integration
