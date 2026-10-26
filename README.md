@@ -1,6 +1,27 @@
 # Placement Portal Application
 ## Web application designed for institutions to manage placements with role-based login and dashboards. It provides an easy way to select, reject and shortlist students for companies. It also gives clear information to students about available placement drives, companies and status of their application. Admin can supervise the process and also select or reject companies and students when required.
 
+## •	Tech Stack: 
+### Python, Flask, SQLite, Flask-Login, Bootstrap, Chart.js, Werkzeug
+* Overview: Architected a role-based web application with dedicated dashboards for Admins, Companies, and Students to streamline campus recruitment and drive management.
+* Key Technical Highlights:
+* o	Implemented Role-Based Access Control (RBAC) using Flask-Login and session authorization to secure approval pipelines and enforce company blacklisting logic.
+* o	Enforced SQLAlchemy unique constraints and rigorous backend validation to block duplicate drive applications and preserve relational database integrity.
+* o	Engineered secure file upload handling via Werkzeug (secure_filename) and integrated dynamic Chart.js analytics for administrative placement statistics.
+---
+## Project Outputs
+* Main dashboard with Role Based Access for Student, Admin and Companies
+<img width="945" height="480" alt="image" src="https://github.com/user-attachments/assets/01e4ae03-9a42-4b43-9839-36e44e86502a" />
+
+* Admin Dashboard with admin metrics view powered by Chart.js
+<img width="945" height="457" alt="image" src="https://github.com/user-attachments/assets/3e46d86e-44ba-4e25-a8f5-df4f7d634a3e" />
+
+* Placement Drives with status of candidate approval
+<img width="945" height="463" alt="image" src="https://github.com/user-attachments/assets/a7732b77-f191-4d04-9b97-d1083624fcb1" />
+
+* Status of student applications with ready to view Resume and Updates
+<img width="945" height="454" alt="image" src="https://github.com/user-attachments/assets/7d909b87-baf8-44b4-ae1f-4a67a52c3c7f" />
+
 ## Issues encountered and solutions
 ## Milestone 0: GitHub Setup
 
